@@ -104,7 +104,7 @@ void generate_cipher(Task t)
 }
 
 int main()
-{
+{ 
 	Task task;
 	machine_config(task);
 	scanf("%hu", &task.p);
