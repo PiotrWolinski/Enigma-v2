@@ -91,15 +91,15 @@ void generate_cipher(Task t)
 
 	for (int i = 0; i < t.msg_size; i++)
 	{
+		t.machine.rotors[0].t_n++;
 		for (int j = 0; j < t.ro_n; j++)
 		{
-
-
-			//tutaj ogarne jeszcze raz sprawe z kodowaniem, tylko ze teraz bede bazowal na ilosci obrotow danego rotora
-
+			t.msg[i] = t.machine.rotors[j].perm[(t.msg[i] - 1 + t.machine.rotors[j].t_n % t.machine.n) % t.machine.n] - 1;
+			/*t.msg[i] = */
 
 		}
-
+		/*t.msg[i] = (t.msg[i] - t.machine.rotors[t.ro_n - 1].t_n % t.machine.n);	*/			//tutaj jakos musze rozwiazac to, zeby liczba ujemna sie zawijala
+		printf("%hu ", t.msg[i]);
 	}
 }
 
