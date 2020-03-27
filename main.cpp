@@ -13,6 +13,7 @@ struct Rotor {
 
 struct Reflector {
 	short* perm;						//tablica do przechowywania jego permutacji
+	short t_n;
 };
 
 struct Machine {
@@ -34,6 +35,19 @@ struct Task {
 	Machine machine;
 };
 
+short reverse(short& input, short& n, Rotor& r, short turns)
+{
+	input = (input + turns) % n;
+
+	for (int i = 0; i < n; i++)
+	{
+		if (r.perm[i]%n == input)
+		{
+			return i + 1;
+		}
+	}
+	return 0;
+}
 
 void machine_config(Task& t)
 {
@@ -81,26 +95,54 @@ void machine_config(Task& t)
 	}
 }
 
+
+//w tescie 2 nie dziala dlatego, ze sa dwa takie same rotory i one sie napisuja
 void generate_cipher(Task t)
 {
+	//tablica tylko do przechowywania obrotow danych rotorow - kolejne indeksy to kolejne rotory w maszynie
+	short* turns = (short*)malloc(t.ro_n * sizeof(short));
+
 	//wyglada podstepnie, ale po prostu dodaje pozycje startowa do liczby obrotow rotora - przygotowuje go do dzialania
 	for (int i = 0; i < t.ro_n; i++)
 	{
-		t.machine.rotors[i].t_n = t.s_pos[i] - 1;
+		turns[i] = t.s_pos[i] - 1;
 	}
-
 	for (int i = 0; i < t.msg_size; i++)
 	{
-		t.machine.rotors[0].t_n++;
+		turns[0]++;
+
 		for (int j = 0; j < t.ro_n; j++)
 		{
-			t.msg[i] = t.machine.rotors[j].perm[(t.msg[i] - 1 + t.machine.rotors[j].t_n % t.machine.n) % t.machine.n] - 1;
-			/*t.msg[i] = */
+			//jesli dany rotor ma notche
+			if (t.machine.rotors[t.ro_id[j]].notch_n && j < t.ro_n - 1)
+			{
+				for (int k = 0; k < t.machine.rotors[t.ro_id[j]].notch_n; k++)
+				{
+					if ((t.machine.rotors[t.ro_id[j]].notch[k] - 1 == turns[j])%t.machine.n )		//notche jeszcze nie dzialaja
+					{
+						turns[j + 1]++;
+					}
+				}
+			}
 
+			t.msg[i] = t.machine.rotors[t.ro_id[j]].perm[(t.msg[i] - 1 + turns[j] % t.machine.n) % t.machine.n];
+			t.msg[i] = (t.msg[i] > turns[j] % t.machine.n) ? t.msg[i] - turns[j] % t.machine.n :
+				t.machine.n - turns[j] % t.machine.n + t.msg[i];
 		}
-		/*t.msg[i] = (t.msg[i] - t.machine.rotors[t.ro_n - 1].t_n % t.machine.n);	*/			//tutaj jakos musze rozwiazac to, zeby liczba ujemna sie zawijala
+
+		t.msg[i] = t.machine.reflectors[t.re_n].perm[t.msg[i] - 1];
+		
+		for (int j = t.ro_n - 1; j >= 0; j--)
+		{
+			t.msg[i] = reverse(t.msg[i], t.machine.n, t.machine.rotors[t.ro_id[j]], turns[j]);
+			t.msg[i] = (t.msg[i] > turns[j] % t.machine.n) ? t.msg[i] - turns[j] % t.machine.n :
+				t.machine.n - turns[j] % t.machine.n + t.msg[i];
+		}
+
 		printf("%hu ", t.msg[i]);
 	}
+	printf("\n");
+	free(turns);
 }
 
 int main()
@@ -145,10 +187,7 @@ int main()
 		}
 		task.msg_size = x;
 
-
 		generate_cipher(task);
-
-
 
 		free(task.msg);
 		free(task.ro_id);
