@@ -33,20 +33,6 @@ struct Task {
 	short* msg;							//tablica do przechowywania wiadomosci do zakodowania
 	Machine machine;
 };
-//
-//short reverse(short& input, short& n, Rotor& r, short turns)
-//{
-//	input = (input + turns) % n;
-//
-//	for (int i = 0; i < n; i++)
-//	{
-//		if (r.perm[i]%n == input)
-//		{
-//			return i + 1;
-//		}
-//	}
-//	return 0;
-//}
 
 void machine_config(Task& t)
 {
@@ -95,12 +81,12 @@ void machine_config(Task& t)
 	}
 }
 
-//w tescie 2 nie dziala dlatego, ze sa dwa takie same rotory i one sie napisuja
+
 void generate_cipher(Task t)
 {
-	short size = (t.ro_n >= 3) ? 3 : t.ro_n;
 	//tablica tylko do przechowywania obrotow danych rotorow - kolejne indeksy to kolejne rotory w maszynie
-	short* turns = (short*)malloc(size * sizeof(short));
+	//musi byc takiego rozmiaru, bo inaczej stos wyrzuca blad przy zwalnianiu
+	short* turns = (short*)malloc(t.ro_n * sizeof(short));
 
 	short first_moved = 0;
 	short second_moved = 0;
@@ -173,11 +159,7 @@ void generate_cipher(Task t)
 		for (int j = t.ro_n - 1; j >= 0; j--)
 		{
 			t.msg[i] = ((t.msg[i] + turns[j]) % t.machine.n) ? (t.msg[i] + turns[j]) % t.machine.n : t.machine.n;
-			/*t.msg[i] = (t.msg[i] + turns[j]) % t.machine.n;*/
-			/*t.msg[i] = reverse(t.msg[i], t.machine.n, t.machine.rotors[t.ro_id[j]], turns[j]);*/
-
 			t.msg[i] = t.msg[i] + t.machine.rotors[t.ro_id[j]].shift[t.msg[i] - 1];
-
 			t.msg[i] = (t.msg[i] > turns[j] % t.machine.n) ? t.msg[i] - turns[j] % t.machine.n :
 				t.machine.n - turns[j] % t.machine.n + t.msg[i];
 		}
