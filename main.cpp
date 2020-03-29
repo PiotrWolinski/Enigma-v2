@@ -36,8 +36,8 @@ struct Task {
 
 void machine_config(Task& t)
 {
-	scanf("%hu", &t.machine.n);
-	scanf("%hu", &t.machine.m);
+	scanf("%hd", &t.machine.n);
+	scanf("%hd", &t.machine.m);
 	t.machine.rotors = (Rotor*)malloc(t.machine.m * sizeof(Rotor));
 
 	short j = 0;
@@ -50,24 +50,24 @@ void machine_config(Task& t)
 
 		while (j < t.machine.n)
 		{
-			scanf("%hu ", &t.machine.rotors[i].perm[j]);
+			scanf("%hd ", &t.machine.rotors[i].perm[j]);
 			t.machine.rotors[i].shift[t.machine.rotors[i].perm[j] - 1] = j - t.machine.rotors[i].perm[j] + 1;
 			j++;
 		}
-		scanf("%hu", &t.machine.rotors[i].notch_n);
+		scanf("%hd", &t.machine.rotors[i].notch_n);
 		if (t.machine.rotors[i].notch_n)
 		{
 			t.machine.rotors[i].notch = (short*)malloc(t.machine.rotors[i].notch_n * sizeof(short));
 			x = 0;
 			while (x < t.machine.rotors[i].notch_n)
 			{
-				scanf("%hu", &t.machine.rotors[i].notch[x]);
+				scanf("%hd", &t.machine.rotors[i].notch[x]);
 				x++;
 			}
 		}
 	}
 
-	scanf("%hu", &t.machine.l);
+	scanf("%hd", &t.machine.l);
 	t.machine.reflectors = (Reflector*)malloc(t.machine.l * sizeof(Reflector));
 	for (int i = 0; i < t.machine.l; i++)
 	{
@@ -75,7 +75,7 @@ void machine_config(Task& t)
 		j = 0;
 		while (j < t.machine.n)
 		{
-			scanf("%hu ", &t.machine.reflectors[i].perm[j]);
+			scanf("%hd ", &t.machine.reflectors[i].perm[j]);
 			j++;
 		}
 	}
@@ -163,7 +163,7 @@ void generate_cipher(Task t)
 			t.msg[i] = (t.msg[i] > turns[j] % t.machine.n) ? t.msg[i] - turns[j] % t.machine.n :
 				t.machine.n - turns[j] % t.machine.n + t.msg[i];
 		}
-		printf("%hu ", t.msg[i]);
+		printf("%hd ", t.msg[i]);
 	}
 	printf("\n");
 	free(turns);
@@ -173,21 +173,21 @@ int main()
 { 
 	Task task;
 	machine_config(task);
-	scanf("%hu", &task.p);
+	scanf("%hd", &task.p);
 	task.msg_size = 2;
 	short x = 0;
 	for (int i = 0; i < task.p; i++)
 	{
-		scanf("%hu ", &task.ro_n);
+		scanf("%hd ", &task.ro_n);
 		task.ro_id = (short*)malloc(task.ro_n * sizeof(short));
 		task.s_pos = (short*)malloc(task.ro_n * sizeof(short));
 
 		for (int j = 0; j < task.ro_n; j++)
 		{
-			scanf("%hu ", &task.ro_id[j]);
-			scanf("%hu ", &task.s_pos[j]);
+			scanf("%hd ", &task.ro_id[j]);
+			scanf("%hd ", &task.s_pos[j]);
 		}
-		scanf("%hu ", &task.re_n);
+		scanf("%hd ", &task.re_n);
 
 		task.msg = (short*)malloc(task.msg_size * sizeof(short));
 
